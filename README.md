@@ -6,19 +6,13 @@ This add-on for XenForo 2.3+ evaluates whether forum content may have been gener
 
 > The system does not apply automatic penalties and does not present its output as definitive AI detection. Risk and confidence scores are signals intended to support moderation decisions.
 
-## Current version
-
-**1.2.0**
-
-V1.2.0 adds a shared AI provider layer with Warext Turkish Writing Checker V1.1.0+ without creating a hard dependency. When both add-ons are installed, the selected provider, model, budget, and usage tracking can be shared from one central configuration. The shared layer operates only through server-side PHP services; no separate AI Content Inspector interop/provider endpoint is exposed to the browser.
-
 ## Core operation
 
 Warext Local Engine is always the base analysis layer. External AI providers are completely optional. Local analysis continues to work even when the external API is disabled, not configured, over quota/budget, or temporarily unavailable.
 
 External verification does not run synchronously while a message is being saved. The local result is stored first, and XenForo may then queue a safe verification job when needed. If the content changes before that job runs, a result tied to the old content hash cannot overwrite the newer message.
 
-## Shared AI layer with Turkish Writing Checker V1.1.0+
+## Shared AI layer with Turkish Writing Checker
 
 When both Warext add-ons are installed, Writing Checker detects the `InteropGateway` service capabilities on the server side. There is no required add-on dependency; either add-on continues working independently if the other one is removed.
 
@@ -106,7 +100,7 @@ The **External AI verification provider** option in ACP supports:
 
 OpenRouter supports a model fallback chain, ZDR routing, data-collection opt-out, price/latency/throughput ordering, and optional response caching.
 
-All external provider paths, including OpenRouter, follow the V1.2.0 shared-task contract. Moderation-only calls retain a small output budget; when writing analysis is requested, the response budget expands enough to return writing issues. Writing responses do not request unnecessary copies of fully corrected text; only issue/correction ranges are returned.
+All external provider paths, including OpenRouter, follow the shared-task contract. Moderation-only calls retain a small output budget; when writing analysis is requested, the response budget expands enough to return writing issues. Writing responses do not request unnecessary copies of fully corrected text; only issue/correction ranges are returned.
 
 For direct providers, minimum local risk, maximum provider weight, maximum characters sent, and timeout are shared options. No unnecessary external job is created when a provider is not configured.
 
@@ -184,13 +178,13 @@ When a moderator changes a result status, the change is stored in `xf_warext_ai_
 
 ## Warext Turkish Writing Checker integration
 
-Warext Turkish Writing Checker is **not a required dependency**. When both add-ons are installed, client-side correction metrics can be added to analysis context through the existing integration bridge; V1.2.0 also provides the server-side shared provider service.
+Warext Turkish Writing Checker is **not a required dependency**. When both add-ons are installed, client-side correction metrics can be added to analysis context through the existing integration bridge; the server-side shared provider service is also available.
 
 If Writing Checker is not installed, AI Content Inspector continues working independently. No third integration package is required.
 
 ## Performance and security
 
-V1.2.0 includes these safeguards in particular:
+The system includes these safeguards in particular:
 
 - unchanged content with the same SHA-256 hash is not analyzed again,
 - external verification does not run synchronously during post save,
@@ -213,7 +207,7 @@ V1.2.0 includes these safeguards in particular:
 
 Standard XenForo add-on installation is used. The package includes the `upload/` directory, `addon.json`, XenForo `_data` records, and the package-level `hashes.json` integrity file.
 
-During the V1.2.0 upgrade, `xf_warext_ai_interop_cache` is created automatically by `Setup.php`. **No manual SQL is required.** Existing analysis and usage-table data is preserved.
+During an upgrade, `xf_warext_ai_interop_cache` is created automatically by `Setup.php`. **No manual SQL is required.** Existing analysis and usage-table data is preserved.
 
 ## Automated validation
 
@@ -225,20 +219,13 @@ The GitHub Actions validation pipeline checks:
 - calibration and score fusion,
 - OpenRouter and direct-provider regressions,
 - OpenAI-compatible provider security/regressions,
-- V1.2 server-only shared AI contract,
+- server-only shared AI contract,
 - shared cache table/upgrade/uninstall contract,
-- frontend cache-key version matching,
+- frontend cache-key consistency,
 - XenForo XML/master-data integrity,
 - absence of a hard Writing Checker dependency,
 - asynchronous provider architecture and content-hash protection,
 - actual/estimated cost and historical-scan behavior.
-
-## Version summary
-
-- AI Content Inspector: **V1.2.0**
-- Compatible Warext Turkish Writing Checker: **V1.1.0+**
-- XenForo: **2.3.0+**
-- Manual SQL: **not required**
 
 ## Support
 
@@ -254,19 +241,13 @@ XenForo 2.3+ için geliştirilen bu eklenti, forum içeriklerinin yapay zekâ il
 
 > Sistem otomatik ceza vermez ve sonucu kesin AI tespiti olarak sunmaz. Risk ve güven puanları moderasyon kararını destekleyen sinyallerdir.
 
-## Güncel sürüm
-
-**1.2.0**
-
-V1.2.0, Warext Türkçe Yazım Denetimi V1.1.0+ ile zorunlu bağımlılık oluşturmayan ortak AI sağlayıcı katmanını ekler. İki eklenti birlikte kullanıldığında seçili provider, model, bütçe ve kullanım takibi tek merkezden paylaşılabilir. Ortak katman yalnız sunucu içindeki PHP servisleri üzerinden çalışır; tarayıcıya ayrı bir AI Content Inspector interop/provider endpoint'i açılmaz.
-
 ## Temel çalışma mantığı
 
 Warext Local Engine her zaman temel analiz katmanıdır. Harici AI sağlayıcısı tamamen opsiyoneldir. Harici API kapalı, yapılandırılmamış, kota/bütçe sınırına ulaşmış veya erişilemez durumda olsa bile yerel analiz çalışmaya devam eder.
 
 Harici doğrulama mesaj kaydı sırasında senkron çalıştırılmaz. Yerel sonuç önce kaydedilir; gerekli görülürse XenForo job kuyruğuna güvenli bir doğrulama işi eklenir. İçerik job çalışmadan önce değişirse eski içerik hash'ine ait sonuç yeni mesajın üzerine yazılamaz.
 
-## Türkçe Yazım Denetimi V1.1.0+ ortak AI katmanı
+## Türkçe Yazım Denetimi ortak AI katmanı
 
 İki Warext eklentisi birlikte kurulduğunda Yazım Denetimi, `InteropGateway` servisinin capability bilgisini sunucu tarafında algılar. Zorunlu add-on dependency yoktur; eklentilerden biri kaldırıldığında diğeri bağımsız çalışmaya devam eder.
 
@@ -354,7 +335,7 @@ ACP'deki **Harici AI doğrulama sağlayıcısı** alanından şu seçenekler kul
 
 OpenRouter tarafında model fallback zinciri, ZDR yönlendirmesi, veri toplama reddi, fiyat/gecikme/throughput sıralaması ve opsiyonel yanıt cache seçeneği bulunur.
 
-OpenRouter dahil tüm dış provider yolları V1.2.0 ortak görev sözleşmesine uyar. Yalnız moderasyon çağrıları küçük çıktı bütçesini korur; yazım görevi istendiğinde cevap bütçesi yazım sorunlarını taşıyabilecek şekilde genişler. Yazım cevabında gereksiz tam düzeltilmiş metin kopyası istenmez; yalnız sorun/düzeltme aralıkları döndürülür.
+OpenRouter dahil tüm dış provider yolları ortak görev sözleşmesine uyar. Yalnız moderasyon çağrıları küçük çıktı bütçesini korur; yazım görevi istendiğinde cevap bütçesi yazım sorunlarını taşıyabilecek şekilde genişler. Yazım cevabında gereksiz tam düzeltilmiş metin kopyası istenmez; yalnız sorun/düzeltme aralıkları döndürülür.
 
 Doğrudan providerlarda minimum yerel risk, maksimum ağırlık, gönderilecek maksimum karakter ve timeout ortak ayarlardır. Provider yapılandırılmamışsa gereksiz harici job oluşturulmaz.
 
@@ -432,13 +413,13 @@ Bir moderatör sonucu durumlandırdığında değişiklik `xf_warext_ai_review_l
 
 ## Warext Türkçe Yazım Denetimi entegrasyonu
 
-Warext Türkçe Yazım Denetimi **zorunlu bağımlılık değildir**. Her iki eklenti kuruluysa istemci tarafındaki düzeltme ölçümleri mevcut entegrasyon köprüsüyle analiz bağlamına eklenebilir; ayrıca V1.2.0 sunucu taraflı ortak provider servisini sunar.
+Warext Türkçe Yazım Denetimi **zorunlu bağımlılık değildir**. Her iki eklenti kuruluysa istemci tarafındaki düzeltme ölçümleri mevcut entegrasyon köprüsüyle analiz bağlamına eklenebilir; sunucu taraflı ortak provider servisi de sunulur.
 
 Writing Checker kurulu değilse AI Content Inspector kendi başına çalışmaya devam eder. Üçüncü bir entegrasyon paketi gerekmez.
 
 ## Performans ve güvenlik
 
-V1.2.0 dahil olmak üzere özellikle şu önlemler bulunur:
+Sistemde özellikle şu önlemler bulunur:
 
 - değişmemiş içerik SHA-256 hash'i tekrar analiz edilmez,
 - harici doğrulama post save sırasında senkron çalışmaz,
@@ -461,7 +442,7 @@ V1.2.0 dahil olmak üzere özellikle şu önlemler bulunur:
 
 Standart XenForo eklenti kurulumu kullanılır. Paket `upload/` dizinini, `addon.json`, XenForo `_data` kayıtlarını ve paket içi `hashes.json` bütünlük dosyasını içerir.
 
-V1.2.0 yükseltmesinde `xf_warext_ai_interop_cache` tablosu `Setup.php` tarafından otomatik oluşturulur. **Manuel SQL gerekmez.** Mevcut analiz/kullanım tablolarındaki veriler korunur.
+Yükseltme sırasında `xf_warext_ai_interop_cache` tablosu `Setup.php` tarafından otomatik oluşturulur. **Manuel SQL gerekmez.** Mevcut analiz/kullanım tablolarındaki veriler korunur.
 
 ## Otomatik doğrulama
 
@@ -473,20 +454,13 @@ GitHub Actions doğrulama hattı şu alanları kontrol eder:
 - kalibrasyon ve skor füzyonu,
 - OpenRouter ve doğrudan provider regresyonları,
 - OpenAI-compatible provider güvenlik/regresyonları,
-- V1.2 server-only ortak AI sözleşmesi,
+- server-only ortak AI sözleşmesi,
 - ortak cache tablo/upgrade/uninstall sözleşmesi,
-- frontend cache anahtarının sürümle eşleşmesi,
+- frontend cache anahtarı tutarlılığı,
 - XenForo XML/master-data bütünlüğü,
 - Writing Checker hard dependency bulunmaması,
 - asenkron provider mimarisi ve içerik-hash koruması,
 - gerçek/tahmini maliyet ve geçmiş tarama davranışı.
-
-## Sürüm özeti
-
-- AI Content Inspector: **V1.2.0**
-- Uyumlu Warext Türkçe Yazım Denetimi: **V1.1.0+**
-- XenForo: **2.3.0+**
-- Manuel SQL: **gerekmez**
 
 ## Destek
 

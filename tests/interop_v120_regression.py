@@ -17,8 +17,8 @@ def require(condition: bool, message: str) -> None:
 
 
 addon = json.loads((ADDON / 'addon.json').read_text(encoding='utf-8'))
-require(addon['version_string'] == '1.2.0', 'addon version must be 1.2.0')
-require(addon['version_id'] == 1020000, 'addon version_id must be 1020000')
+require(tuple(map(int, addon['version_string'].split('.'))) >= (1, 2, 0), 'interop requires add-on version 1.2.0 or newer')
+require(int(addon['version_id']) >= 1020000, 'interop requires version_id 1020000 or newer')
 require('Warext/TurkishSpellCheck' not in json.dumps(addon, ensure_ascii=False), 'hard dependency on spell checker is forbidden')
 require('sunucu içinde' in addon.get('description', ''), 'metadata must describe server-only interop')
 
@@ -28,7 +28,7 @@ require('warext-ai-interop' not in route_prefixes, 'shared provider interop must
 require(not (ADDON / 'Pub/Controller/Interop.php').exists(), 'unused public interop controller must not ship')
 
 modifications = (DATA / 'template_modifications.xml').read_text(encoding='utf-8')
-require('?wai=1020000' in modifications, 'frontend cache key must match v1.2.0 version_id')
+require(f"?wai={addon['version_id']}" in modifications, 'frontend cache key must match active add-on version_id')
 require('?wai=1010400' not in modifications, 'stale frontend cache key must not remain')
 
 options = ET.parse(DATA / 'options.xml').getroot()
